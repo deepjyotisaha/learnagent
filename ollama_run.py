@@ -34,12 +34,15 @@ def generate_response(prompt=prompt, model=model_name):
 
 if __name__ == "__main__":
 	console = Console()
-	console.print(f"\n[bold white on blue]   USING MODEL   [/bold white on blue]", justify="center")
-	console.print(f"[bold blue]{model_name}[/bold blue]\n", justify="center")
-	console.rule("[bold green]PROMPT TO LLM")
+	console.print(f"[bold blue] USING MODEL[/bold blue]\n", justify="center")
+	console.print(f"\n[bold white on blue]   {model_name}  [/bold white on blue]", justify="center")
+	#console.print(f"[bold blue]{model_name}[/bold blue]\n", justify="center")
+	#console.rule("[bold green]PROMPT TO LLM")
 	prompt = Prompt.ask("[bold green]Enter your prompt")
-	console.print(Panel(prompt, title="[bold yellow]Prompt to LLM[/bold yellow]", style="bold yellow", border_style="bright_yellow"))
+	print("\n")
+	console.print(Panel(prompt, title="[bold yellow]LLM Prompt[/bold yellow]", style="bold yellow", border_style="bright_yellow"))
+	print("\n")
 	result = generate_response(prompt)
-	console.rule("[bold magenta]LLM RESPONSE")
+	#console.rule("[bold magenta]LLM RESPONSE")
 	console.print(Panel(result, title="[bold cyan]LLM Response[/bold cyan]", style="bold cyan", border_style="bright_cyan"))
 

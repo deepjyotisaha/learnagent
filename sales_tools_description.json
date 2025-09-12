@@ -1,0 +1,27 @@
+[
+  {
+    "name": "summarize_sales",
+    "description": "Summarizes total sales from the data.",
+    "parameters": ["file"]
+  },
+  {
+    "name": "get_top_product",
+    "description": "Returns the product with the highest sales.",
+    "parameters": ["file"]
+  },
+  {
+    "name": "average_sales",
+    "description": "Calculates average sales value.",
+    "parameters": ["file"]
+  },
+  {
+    "name": "filter_by_region",
+    "description": "Filters sales data by region.",
+    "parameters": ["file", "region"]
+  },
+  {
+    "name": "sales_trend",
+    "description": "Shows sales trend over time.",
+    "parameters": ["file"]
+  }
+]

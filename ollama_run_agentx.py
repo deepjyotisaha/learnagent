@@ -30,9 +30,8 @@ tool_functions = {
     "filter_by_region": filter_by_region,
     "sales_trend": sales_trend,
 }
-# If you want to use real functions, import from sales_tools and update tool_functions accordingly.
 
-def generate_system_prompt(context, user_profile, tools_desc, history, user_prompt):
+def generate_system_prompt(context, user_profile, tools_desc, history, user_query, current_message):
     tools_info = ""
     for tool in tools_desc:
         tools_info += (
@@ -75,8 +74,11 @@ If the task is complete, respond with:
 }}
 Otherwise, answer directly and suggest the next step.
 
-User's message or next step:
-{user_prompt}
+User's overall query:
+{user_query}
+
+Current message:
+{current_message}
 """
 
 def generate_response(prompt, model=model_name):
@@ -118,13 +120,13 @@ if __name__ == "__main__":
     history = []
     loop_num = 1
 
-    user_prompt = Prompt.ask("[bold yellow]Enter your overall task or question for the AI")
+    user_query = Prompt.ask("[bold yellow]Enter your overall task or question for the AI")
+    current_message = user_query  # Start with the overall query as the first message
 
-    current_input = user_prompt
     while True:
         console.print(f"\n[bold yellow]--- Loop {loop_num} ---[/bold yellow]\n")
         system_prompt = generate_system_prompt(
-            grounding_blurb, user_profile, tools_desc, history, current_input
+            grounding_blurb, user_profile, tools_desc, history, user_query, current_message
         )
         console.print(Panel(system_prompt, title="[bold cyan]System Prompt[/bold cyan]", border_style="cyan"))
 
@@ -140,6 +142,7 @@ if __name__ == "__main__":
                 if tool_json.get("complete"):
                     final_answer = tool_json.get("final_answer", "Task complete.")
                     console.print(Panel(final_answer, title="[bold green]Final Answer[/bold green]", border_style="green"))
+                    history.append((current_message, final_answer))
                     break
                 elif "tool" in tool_json:
                     tool_name = tool_json.get("tool")
@@ -149,22 +152,28 @@ if __name__ == "__main__":
                                         title="[green]Tool Execution[/green]", border_style="green"))
                     # Add to history and continue with next step
                     agent_reply = f"Tool used: {tool_name}\nResult: {tool_result}"
-                    history.append((current_input, agent_reply))
-                    current_input = tool_json.get("next_step", "What should I do next?")
+                    history.append((current_message, agent_reply))
+                    # LLM's next_step is a question or instruction for the user
+                    next_step = tool_json.get("next_step", "What should I do next?")
+                    user_input = Prompt.ask(f"[bold yellow]Agent: {next_step}\nYour reply")
+                    current_message = f"{next_step}\nUser: {user_input}"
                 else:
                     # Not a tool or completion, treat as normal reply
                     agent_reply = llm_response
-                    history.append((current_input, agent_reply))
-                    current_input = Prompt.ask("[bold yellow]Enter your next message or step for the AI")
+                    history.append((current_message, agent_reply))
+                    user_input = Prompt.ask("[bold yellow]Agent: (next step or question above)\nYour reply")
+                    current_message = user_input
             else:
                 # Not a JSON, treat as normal reply
                 agent_reply = llm_response
-                history.append((current_input, agent_reply))
-                current_input = Prompt.ask("[bold yellow]Enter your next message or step for the AI")
+                history.append((current_message, agent_reply))
+                user_input = Prompt.ask("[bold yellow]Agent: (next step or question above)\nYour reply")
+                current_message = user_input
         except Exception as e:
             agent_reply = llm_response + f"\n[red]Error parsing tool call: {e}[/red]"
-            history.append((current_input, agent_reply))
-            current_input = Prompt.ask("[bold yellow]Enter your next message or step for the AI")
+            history.append((current_message, agent_reply))
+            user_input = Prompt.ask("[bold yellow]Agent: (next step or question above)\nYour reply")
+            current_message = user_input
 
         loop_num += 1
-        input("\n[bold blue]Press Enter to proceed to the next loop...[/bold blue]")
+        input("\n[bold blue]Press Enter to proceed to the next loop...[/bold blue]\n")

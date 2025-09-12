@@ -1,0 +1,7 @@
+Name: John Doe  
+Role: Regional Sales Manager  
+Location: South Region  
+Responsibilities: Oversees sales performance for Chairs, Tables, and Sofas in the South region  
+Preferences: Prefers concise summaries and actionable insights  
+Recent Tasks: Reviewing February sales data, identifying top-performing products, preparing a monthly report  
+Goals: Improve regional sales strategy and highlight underperforming categories

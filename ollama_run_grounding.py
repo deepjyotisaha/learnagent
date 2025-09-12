@@ -19,7 +19,7 @@ def generate_llm_prompt(user_prompt):
     return f"""
     You are an AI assistant. Your job is to answer user's question correctly.
 
-    Use the following information to answer the question accurately.
+    Use ONLY the following information to answer the question accurately. Don't assume any information beyond this to provide the answer. If the information is not present, simply state that you don't know the answer. Do not make up any answers.
 
     Context:
     {grounding_blurb}

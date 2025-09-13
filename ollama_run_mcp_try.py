@@ -165,6 +165,8 @@ async def main():
             "parameters": param_names
         })
     console.print(f"[bold green]MCP Calculator Tools Initialized[/bold green]\n", justify="center")
+    # Print all MCP tools in a single panel
+    tool_lines = []
     for tool in mcp_tools:
         param_names = []
         if hasattr(tool, 'parameters') and isinstance(tool.parameters, list):
@@ -174,7 +176,9 @@ async def main():
         elif hasattr(tool, 'model_dump'):
             dump = tool.model_dump()
             param_names = dump.get('parameters', []) or dump.get('param_names', [])
-        console.print(Panel(f"Name: {tool.name}\nDescription: {getattr(tool, 'description', '')}\nParameters: {param_names}", title="MCP Tool"))
+        tool_lines.append(f"Name: {tool.name}\nDescription: {getattr(tool, 'description', '')}\nParameters: {param_names}\n")
+    all_tools_str = '\n'.join(tool_lines)
+    console.print(Panel(all_tools_str, title="All MCP Tools"))
 
     history = []
     loop_num = 1

@@ -28,9 +28,7 @@ The project is organized to help you learn and experiment with LLM agents step b
 | `sales_data.csv`                   | 📊 **Sales Data**: Example sales data for use with sales tools.                              |
 | `ikea_return_policy.txt`           | 📄 **Grounding Context**: Example context for grounding agent responses.                     |
 | `user_profile.txt`                 | 👤 **User Profile**: Example user memory/profile for the agent.                              |
-| `requirements.txt`                 | 📦 **Dependencies**: All required Python dependencies for this project.                      |
-| `AI4All - Hands-on - Fundamentals of LLM & Agents.code-workspace` | VS Code workspace settings.                             |
-| `__pycache__/`                     | Python bytecode cache (auto-generated).                                                      |
+| `requirements.txt`                 | 📦 **Dependencies**: All required Python dependencies for this project.                      |                                                |
 
 
 ---

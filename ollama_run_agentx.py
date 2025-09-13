@@ -10,6 +10,10 @@ model_url_generate = "http://localhost:11434/api/generate"
 
 #Get me the sales for relevant region, and let me know in how many days can I return stuff from IKEA
 
+#Add RAG
+#Add MCP
+#Show full integration if possible
+
 # Load grounding context
 with open('ikea_return_policy.txt', 'r') as f:
     grounding_blurb = f.read()

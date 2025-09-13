@@ -146,8 +146,18 @@ async def try_execute_tool(tool_name, params, mcp_math_tools):
             tool = next((t for t in mcp_math_tools if t.name == tool_name), None)
             if tool:
                 # Prepare arguments in order
-                param_list = [params.get(p, 0) for p in tool.parameters]
-                result = await tool(*param_list)
+                # Try to get parameter names robustly
+                if hasattr(tool, "param_names"):
+                    param_names = tool.param_names
+                else:
+                    # Fallback: use inspect
+                    import inspect
+                    sig = inspect.signature(tool)
+                    param_names = list(sig.parameters.keys())
+                #param_list = [params.get(p, 0) for p in param_names]
+                #result = await tool(*param_list)
+                param_dict = {p: params.get(p, 0) for p in param_names}
+                result = await tool.call(**param_dict)
                 return result
         return f"Tool '{tool_name}' not found."
     except Exception as e:
@@ -190,7 +200,7 @@ async def main():
         elif hasattr(tool, 'model_dump'):
             dump = tool.model_dump()
             param_names = dump.get('parameters', []) or dump.get('param_names', [])
-        tool_lines.append(f"Name: {tool.name}\nDescription: {getattr(tool, 'description', '')}\n")
+        tool_lines.append(f"Name: {tool.name}\nDescription: {getattr(tool, 'description', '')}\nParameters: {param_names}\n")
     math_tools_desc = '\n'.join(tool_lines)
     console.print(Panel(math_tools_desc, title="All MCP Tools"))
 

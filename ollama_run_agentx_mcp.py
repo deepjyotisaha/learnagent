@@ -304,7 +304,7 @@ async def main():
                         elif "tool" in tool_json:
                             tool_name = tool_json.get("tool")
                             params = tool_json.get("parameters", {})
-                            tool_result = try_execute_tool(tool_name, params, math_tools)
+                            tool_result = await try_execute_tool(tool_name, params, math_tools)
                             console.print(Panel(f"Tool: {tool_name}\nParameters: {params}\nResult: {tool_result}",
                                                 title="[green]Tool Execution[/green]", border_style="green"))
                             # Add to history and continue with next step

@@ -219,7 +219,12 @@ async def main():
     console = Console()
     console.print(f"[bold blue]USING MODEL[/bold blue]\n", justify="center")
     console.print(f"\n[bold white on blue]   {model_name}  [/bold white on blue]", justify="center")
+    print("\n")
     console.rule("[bold green]AgentX Demo: Grounding + Tools + Memory + Context + Multi-step Reasoning")
+    print("\n")
+
+     # Add this panel to indicate MCP math server initialization
+    console.print(Panel("Initializing MCP math server...", title="MCP Math Server", border_style="bold cyan"))
 
     #Create session to MCP server and get tools
     math_server_params = StdioServerParameters(
@@ -228,19 +233,19 @@ async def main():
     )
 
     async with stdio_client(math_server_params) as (math_read, math_write):
-        print("Connection established, creating session...")
+        #print("Connection established, creating session...")
         async with ClientSession(math_read, math_write) as math_session:
-            print("Session created, initializing...")
+            #print("Session created, initializing...")
             await math_session.initialize()
             
             # Get available tools
-            print("Requesting tool list...")
+            #print("Requesting tool list...")
             tools_result = await math_session.list_tools()
             math_tools = tools_result.tools
-            print(f"Math server tools: {len(math_tools)}")
+            #print(f"Math server tools: {len(math_tools)}")
             for tool in math_tools:
                 tool.server_session = math_session
-            print(f"Successfully retrieved {len(math_tools)} math tools")
+            #print(f"Successfully retrieved {len(math_tools)} math tools")
             
             try:
                 math_tools_description = []
@@ -263,16 +268,22 @@ async def main():
 
                         tool_desc = f"{i+1}. {name}({params_str}) - {desc}"
                         math_tools_description.append(tool_desc)
-                        print(f"Added description for tool: {tool_desc}")
+                        #print(f"Added description for tool: {tool_desc}")
                     except Exception as e:
-                        print(f"Error processing tool {i}: {e}")
+                        #print(f"Error processing tool {i}: {e}")
                         math_tools_description.append(f"{i+1}. Error processing tool")
                 
                 math_tools_description = "\n".join(math_tools_description)
-                print("Successfully created tools description")
+                #print("Successfully created tools description")
             except Exception as e:
                 print(f"Error creating tools description: {e}")
                 math_tools_description = "Error loading tools"
+
+            # ADD THIS PANEL TO SHOW THE TOOLS
+            console.print(Panel(math_tools_description, title="Available MCP Math Tools", border_style="bold cyan"))
+
+            console.print(Panel("MCP math server initialized with tools.", title="MCP Math Server", border_style="bold cyan"))
+            print("\n")
 
             history = []
             loop_num = 1

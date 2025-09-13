@@ -1,6 +1,6 @@
-# 🤖 AI4All - Hands-on: Fundamentals of LLM & Agents
+# 🤖 Hands-on: Fundamentals of LLM & Agents
 
-Welcome to the **AI4All - Hands-on - Fundamentals of LLM & Agents** project! This repository demonstrates how to build, ground, and extend LLM-powered agents with tool use, memory, and multi-step reasoning, including integration with the Model Context Protocol (MCP).
+Welcome to the **Hands-on - Fundamentals of LLM & Agents** project! This repository demonstrates how to build, ground, and extend LLM-powered agents with tool use, memory, and multi-step reasoning, including integration with the Model Context Protocol (MCP).
 
 ---
 

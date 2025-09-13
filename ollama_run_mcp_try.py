@@ -5,7 +5,7 @@ import json
 from rich.console import Console, Group
 from rich.panel import Panel
 from rich.prompt import Prompt
-from sales_tools import summarize_sales, get_top_product, average_sales, filter_by_region, sales_trend
+from sales_tools import summarize_sales, get_top_product, average_sales, filter_by_region, sales_trend, total_sales_by_region
 from mcp.client.stdio import StdioServerParameters, stdio_client
 from mcp.client.session import ClientSession
 
@@ -40,6 +40,7 @@ tool_functions = {
     "average_sales": average_sales,
     "filter_by_region": filter_by_region,
     "sales_trend": sales_trend,
+    "total_sales_by_region": total_sales_by_region,
 }
 
 async def get_mcp_tools():

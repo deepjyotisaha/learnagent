@@ -28,26 +28,23 @@ mcp = FastMCP("Calculator")
 
 @mcp.tool()
 def add(a: float, b: float) -> float:
-    """Add two numbers together and return the result."""
+    """Add two numbers together and return the result. Parameters: a, b; Example: add(2, 3)"""
     return a + b
 
 @mcp.tool()
 def subtract(a: float, b: float) -> float:
-    """Subtract b from a and return the result."""
+    """Subtract b from a and return the result. Parameters: a, b; Example: subtract(5, 2)"""
     return a - b
 
 @mcp.tool()
 def multiply(a: float, b: float) -> float:
-    """Multiply two numbers together and return the result."""
+    """Multiply two numbers together and return the result. Parameters: a, b; Example: multiply(3, 4)"""
     return a * b
 
 @mcp.tool()
 def divide(a: float, b: float) -> float:
     """
-    Divide a by b and return the result.
-    
-    Raises:
-        ValueError: If b is zero
+    Divide a by b and return the result. Parameters: a, b; Example: divide(10, 2)
     """
     if b == 0:
         raise ValueError("Cannot divide by zero")

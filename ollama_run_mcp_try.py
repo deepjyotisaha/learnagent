@@ -57,7 +57,7 @@ async def get_mcp_tools():
                 tool.server_session = math_session
             return math_tools
 
-def generate_system_prompt(context, user_profile, tools_desc, history, user_query, current_message):
+def generate_system_prompt(context, user_profile, tools_desc, math_tools_desc, history, user_query, current_message):
     tools_info = ""
     for tool in tools_desc:
         tools_info += (
@@ -80,6 +80,9 @@ You have access to the following:
 [Available Sales Tools]
 {tools_info}
 File name: {file}
+
+[Available MCP Math Tools]
+{math_tools_desc}
 
 [User Profile]
 {user_profile}
@@ -127,15 +130,25 @@ def generate_response(prompt, model=model_name):
                 output += data
     return output
 
-def try_execute_tool(tool_name, params):
+async def try_execute_tool(tool_name, params, mcp_math_tools):
     try:
-        if tool_name not in tool_functions:
-            return f"Tool '{tool_name}' not found."
-        func = tool_functions[tool_name]
-        if tool_name == "filter_by_region":
-            return func(params.get("file", file), params.get("region", region))
-        else:
-            return func(params.get("file", file))
+        if tool_name in tool_functions:
+            func = tool_functions[tool_name]
+            if tool_name == "filter_by_region":
+                return func(params.get("file", file), params.get("region", region))
+            else:
+                return func(params.get("file", file))
+            
+        # MCP calculator tools
+        mcp_tool_names = [tool.name for tool in mcp_math_tools]
+        if tool_name in mcp_tool_names:
+            tool = next((t for t in mcp_math_tools if t.name == tool_name), None)
+            if tool:
+                # Prepare arguments in order
+                param_list = [params.get(p, 0) for p in tool.parameters]
+                result = await tool(*param_list)
+                return result
+        return f"Tool '{tool_name}' not found."
     except Exception as e:
         return f"Error executing tool: {e}"
 
@@ -176,9 +189,9 @@ async def main():
         elif hasattr(tool, 'model_dump'):
             dump = tool.model_dump()
             param_names = dump.get('parameters', []) or dump.get('param_names', [])
-        tool_lines.append(f"Name: {tool.name}\nDescription: {getattr(tool, 'description', '')}\nParameters: {param_names}\n")
-    all_tools_str = '\n'.join(tool_lines)
-    console.print(Panel(all_tools_str, title="All MCP Tools"))
+        tool_lines.append(f"Name: {tool.name}\nDescription: {getattr(tool, 'description', '')}\n")
+    math_tools_desc = '\n'.join(tool_lines)
+    console.print(Panel(math_tools_desc, title="All MCP Tools"))
 
     history = []
     loop_num = 1
@@ -189,7 +202,7 @@ async def main():
     while True:
         console.print(f"\n[bold yellow]--- Loop {loop_num} ---[/bold yellow]\n")
         system_prompt = generate_system_prompt(
-            grounding_blurb, user_profile, tools_desc, history, user_query, current_message
+            grounding_blurb, user_profile, tools_desc, math_tools_desc, history, user_query, current_message
         )
         console.print(Panel(system_prompt, title="[bold cyan]System Prompt[/bold cyan]", border_style="cyan"))
 
@@ -210,7 +223,7 @@ async def main():
                 elif "tool" in tool_json:
                     tool_name = tool_json.get("tool")
                     params = tool_json.get("parameters", {})
-                    tool_result = try_execute_tool(tool_name, params)
+                    tool_result = await try_execute_tool(tool_name, params, mcp_tools)
                     console.print(Panel(f"Tool: {tool_name}\nParameters: {params}\nResult: {tool_result}",
                                         title="[green]Tool Execution[/green]", border_style="green"))
                     # Add to history and continue with next step

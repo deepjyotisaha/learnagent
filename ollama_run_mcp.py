@@ -183,10 +183,29 @@ async def execute_tool_in_mcp(tool_name, params, tools):
     print(f"DEBUG: Final arguments: {arguments}")
     print(f"DEBUG: Calling tool {func_name}")
 
-    #result = await tools.server_session.call_tool(func_name, arguments=arguments)
-    result = await session.call_tool(func_name, arguments=arguments)
-    print(f"DEBUG: Raw result: {result}")
-    return str(result)
+    try:
+        result = await session.call_tool(func_name, arguments=arguments)
+        print(f"DEBUG: Raw result: {result}")
+        # Get the full result content
+        if hasattr(result, 'content'):
+            print(f"DEBUG: Result has content attribute")
+            # Handle multiple content items
+            if isinstance(result.content, list):
+                iteration_result = [
+                    item.text if hasattr(item, 'text') else str(item)
+                    for item in result.content
+                ]
+            else:
+                iteration_result = str(result.content)
+        else:
+            print(f"DEBUG: Result has no content attribute")
+            iteration_result = str(result)
+        return iteration_result
+    except Exception as e:
+        import traceback
+        tb = traceback.format_exc()
+        print(f"DEBUG: Exception during call_tool: {e}\n{tb}")
+        return f"Error executing tool: {e}"
 
 
 async def try_execute_tool(tool_name, params, math_tools):
@@ -264,68 +283,67 @@ async def main():
                 print(f"Error creating tools description: {e}")
                 math_tools_description = "Error loading tools"
                 
+            history = []
+            loop_num = 1
 
-    history = []
-    loop_num = 1
+            user_query = Prompt.ask("[bold yellow]Enter your overall task or question for the AI")
+            current_message = user_query  # Start with the overall query as the first message
 
-    user_query = Prompt.ask("[bold yellow]Enter your overall task or question for the AI")
-    current_message = user_query  # Start with the overall query as the first message
+            while True:
+                console.print(f"\n[bold yellow]--- Loop {loop_num} ---[/bold yellow]\n")
+                system_prompt = generate_system_prompt(
+                    grounding_blurb, user_profile, tools_desc, math_tools_description, history, user_query, current_message
+                )
+                console.print(Panel(system_prompt, title="[bold cyan]System Prompt[/bold cyan]", border_style="cyan"))
 
-    while True:
-        console.print(f"\n[bold yellow]--- Loop {loop_num} ---[/bold yellow]\n")
-        system_prompt = generate_system_prompt(
-            grounding_blurb, user_profile, tools_desc, math_tools_description, history, user_query, current_message
-        )
-        console.print(Panel(system_prompt, title="[bold cyan]System Prompt[/bold cyan]", border_style="cyan"))
+                llm_response = generate_response(system_prompt)
+                console.print(Panel(llm_response, title="[bold magenta]LLM Response[/bold magenta]", border_style="magenta"))
 
-        llm_response = generate_response(system_prompt)
-        console.print(Panel(llm_response, title="[bold magenta]LLM Response[/bold magenta]", border_style="magenta"))
-
-        # Try to parse tool call or completion from LLM response
-        try:
-            import re
-            match = re.search(r"\{[\s\S]*\}", llm_response)
-            if match:
-                tool_json = json.loads(match.group())
-                if tool_json.get("complete"):
-                    final_answer = tool_json.get("final_answer", "Task complete.")
-                    console.print(Panel(final_answer, title="[bold green]Final Answer[/bold green]", border_style="green"))
-                    history.append((current_message, final_answer))
-                    break
-                elif "tool" in tool_json:
-                    tool_name = tool_json.get("tool")
-                    params = tool_json.get("parameters", {})
-                    print(f"DEBUG: Executing tool {tool_name} with params {params}")
-                    tool_result = await try_execute_tool(tool_name, params, math_tools)
-                    console.print(Panel(f"Tool: {tool_name}\nParameters: {params}\nResult: {tool_result}",
-                                        title="[green]Tool Execution[/green]", border_style="green"))
-                    # Add to history and continue with next step
-                    agent_reply = f"Tool used: {tool_name}\nResult: {tool_result}"
-                    history.append((current_message, agent_reply))
-                    # LLM's next_step is a question or instruction for the user
-                    next_step = tool_json.get("next_step", "What should I do next?")
-                    user_input = Prompt.ask(f"[bold yellow]Agent: {next_step}\nYour reply")
-                    current_message = f"{next_step}\nUser: {user_input}"
-                else:
-                    # Not a tool or completion, treat as normal reply
-                    agent_reply = llm_response
+                # Try to parse tool call or completion from LLM response
+                try:
+                    import re
+                    match = re.search(r"\{[\s\S]*\}", llm_response)
+                    if match:
+                        tool_json = json.loads(match.group())
+                        if tool_json.get("complete"):
+                            final_answer = tool_json.get("final_answer", "Task complete.")
+                            console.print(Panel(final_answer, title="[bold green]Final Answer[/bold green]", border_style="green"))
+                            history.append((current_message, final_answer))
+                            break
+                        elif "tool" in tool_json:
+                            tool_name = tool_json.get("tool")
+                            params = tool_json.get("parameters", {})
+                            print(f"DEBUG: Executing tool {tool_name} with params {params}")
+                            tool_result = await try_execute_tool(tool_name, params, math_tools)
+                            console.print(Panel(f"Tool: {tool_name}\nParameters: {params}\nResult: {tool_result}",
+                                                title="[green]Tool Execution[/green]", border_style="green"))
+                            # Add to history and continue with next step
+                            agent_reply = f"Tool used: {tool_name}\nResult: {tool_result}"
+                            history.append((current_message, agent_reply))
+                            # LLM's next_step is a question or instruction for the user
+                            next_step = tool_json.get("next_step", "What should I do next?")
+                            user_input = Prompt.ask(f"[bold yellow]Agent: {next_step}\nYour reply")
+                            current_message = f"{next_step}\nUser: {user_input}"
+                        else:
+                            # Not a tool or completion, treat as normal reply
+                            agent_reply = llm_response
+                            history.append((current_message, agent_reply))
+                            user_input = Prompt.ask("[bold yellow]Agent: (next step or question above)\nYour reply")
+                            current_message = user_input
+                    else:
+                        # Not a JSON, treat as normal reply
+                        agent_reply = llm_response
+                        history.append((current_message, agent_reply))
+                        user_input = Prompt.ask("[bold yellow]Agent: (next step or question above)\nYour reply")
+                        current_message = user_input
+                except Exception as e:
+                    agent_reply = llm_response + f"\n[red]Error parsing tool call: {e}[/red]"
                     history.append((current_message, agent_reply))
                     user_input = Prompt.ask("[bold yellow]Agent: (next step or question above)\nYour reply")
                     current_message = user_input
-            else:
-                # Not a JSON, treat as normal reply
-                agent_reply = llm_response
-                history.append((current_message, agent_reply))
-                user_input = Prompt.ask("[bold yellow]Agent: (next step or question above)\nYour reply")
-                current_message = user_input
-        except Exception as e:
-            agent_reply = llm_response + f"\n[red]Error parsing tool call: {e}[/red]"
-            history.append((current_message, agent_reply))
-            user_input = Prompt.ask("[bold yellow]Agent: (next step or question above)\nYour reply")
-            current_message = user_input
 
-        loop_num += 1
-        input("\n[bold blue]Press Enter to proceed to the next loop...[/bold blue]\n")
+                loop_num += 1
+                input("\n[bold blue]Press Enter to proceed to the next loop...[/bold blue]\n")
 
 
 if __name__ == "__main__":

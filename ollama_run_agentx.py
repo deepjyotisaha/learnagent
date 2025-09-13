@@ -114,7 +114,7 @@ def try_execute_tool(tool_name, params):
         if tool_name not in tool_functions:
             return f"Tool '{tool_name}' not found."
         func = tool_functions[tool_name]
-        if tool_name == "filter_by_region":
+        if tool_name == "filter_by_region" or tool_name == "total_sales_by_region":
             return func(params.get("file", file), params.get("region", region))
         else:
             return func(params.get("file", file))

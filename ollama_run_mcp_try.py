@@ -135,7 +135,7 @@ async def try_execute_tool(tool_name, params, mcp_math_tools):
     try:
         if tool_name in tool_functions:
             func = tool_functions[tool_name]
-            if tool_name == "filter_by_region":
+            if tool_name == "filter_by_region" or tool_name == "total_sales_by_region":
                 return func(params.get("file", file), params.get("region", region))
             else:
                 return func(params.get("file", file))

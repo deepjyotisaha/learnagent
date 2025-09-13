@@ -4,21 +4,34 @@ Welcome to the **AI4All - Hands-on - Fundamentals of LLM & Agents** project! Thi
 
 ---
 
-## 📂 Project Structure & File Guide
 
-| File/Folder                  | Description                                                                                   |
-|-----------------------------|----------------------------------------------------------------------------------------------|
-| `ollama_run_agentx.py`      | Main agent demo: LLM + sales tools + memory + context + multi-step reasoning.                |
-| `ollama_run_agentx_mcp.py`  | Agent demo with dynamic MCP tool discovery and execution (calculator tools via MCP server).   |
-| `ollama_run_mcp_try.py`     | Example/test client for MCP tool invocation and debugging.                                    |
-| `mcp_calculator_server.py`  | MCP server exposing calculator tools (add, subtract, multiply, divide) via stdio.             |
-| `sales_tools.py`            | Sales data analysis tools (summarize, filter, trend, total by region, etc.).                 |
-| `test_sales_tools.py`       | Unit tests for sales tools.                                                                   |
-| `sales_tools_description.json` | Descriptions and parameters for each sales tool.                                            |
-| `sales_data.csv`            | Example sales data for use with sales tools.                                                  |
-| `ikea_return_policy.txt`    | Example grounding context for the agent.                                                      |
-| `user_profile.txt`          | Example user memory/profile for the agent.                                                    |
-| `requirements.txt`          | All required Python dependencies for this project.                                            |
+## 📂 Project Structure & Conceptual Build-up
+
+The project is organized to help you learn and experiment with LLM agents step by step, from the simplest to the most advanced. Here’s the recommended order:
+
+| File/Folder                        | Concept/Stage                                                                                 |
+|------------------------------------|----------------------------------------------------------------------------------------------|
+| `helloworld.py`                    | 🟢 **Hello World**: Minimal LLM call, basic prompt/response.                                 |
+| `ollama_run_pretrained.py`         | 🟢 **Pretrained LLM**: Use a base LLM for simple Q&A.                                        |
+| `ollama_run_finetuned.py`          | 🟡 **Fine-tuned LLM**: Use a fine-tuned LLM for improved task performance.                   |
+| `ollama_run_no_grounding.py`       | 🟡 **No Grounding**: LLM agent without external context.                                     |
+| `ollama_run_grounding.py`          | 🟠 **Grounding**: Add external context (e.g., policies) to LLM agent.                        |
+| `ollama_run_sales_tools.py`        | 🟠 **Tool Use**: LLM agent can call Python sales tools for data analysis.                    |
+| `ollama_run_user_memory.py`        | 🟠 **User Memory**: Add persistent user profile/memory to agent.                             |
+| `ollama_run_agentx.py`             | 🟣 **AgentX**: Full agent with LLM, tools, memory, context, and multi-step reasoning.        |
+| `ollama_run_agentx_mcp.py`         | 🟣 **AgentX + MCP**: AgentX with dynamic MCP tool discovery and execution.                   |
+| `ollama_run_mcp_try.py`            | 🧪 **MCP Client Example**: Example/test client for MCP tool invocation and debugging.         |
+| `mcp_calculator_server.py`         | 🧮 **MCP Calculator Server**: Exposes calculator tools (add, subtract, multiply, divide).    |
+| `sales_tools.py`                   | 🛠️ **Sales Tools**: Python functions for sales data analysis.                               |
+| `test_sales_tools.py`              | 🧪 **Sales Tools Tests**: Unit tests for sales tools.                                        |
+| `sales_tools_description.json`     | 📝 **Sales Tools Metadata**: Descriptions and parameters for each sales tool.                |
+| `sales_data.csv`                   | 📊 **Sales Data**: Example sales data for use with sales tools.                              |
+| `ikea_return_policy.txt`           | 📄 **Grounding Context**: Example context for grounding agent responses.                     |
+| `user_profile.txt`                 | 👤 **User Profile**: Example user memory/profile for the agent.                              |
+| `requirements.txt`                 | 📦 **Dependencies**: All required Python dependencies for this project.                      |
+| `AI4All - Hands-on - Fundamentals of LLM & Agents.code-workspace` | VS Code workspace settings.                             |
+| `__pycache__/`                     | Python bytecode cache (auto-generated).                                                      |
+
 
 ---
 
@@ -68,10 +81,18 @@ python mcp_calculator_server.py
 
 ---
 
+
 ## 📄 File Details
 
-- **ollama_run_agentx.py**: Main agent loop with LLM, sales tools, and memory.
-- **ollama_run_agentx_mcp.py**: Agent with dynamic MCP tool integration (calculator tools discovered and called at runtime).
+- **helloworld.py**: Minimal LLM call, basic prompt/response.
+- **ollama_run_pretrained.py**: Use a base LLM for simple Q&A.
+- **ollama_run_finetuned.py**: Use a fine-tuned LLM for improved task performance.
+- **ollama_run_no_grounding.py**: LLM agent without external context.
+- **ollama_run_grounding.py**: Add external context (e.g., policies) to LLM agent.
+- **ollama_run_sales_tools.py**: LLM agent can call Python sales tools for data analysis.
+- **ollama_run_user_memory.py**: Add persistent user profile/memory to agent.
+- **ollama_run_agentx.py**: Full agent with LLM, tools, memory, context, and multi-step reasoning.
+- **ollama_run_agentx_mcp.py**: AgentX with dynamic MCP tool discovery and execution.
 - **ollama_run_mcp_try.py**: Example/test client for MCP tool invocation and debugging.
 - **mcp_calculator_server.py**: MCP server exposing calculator tools (add, subtract, multiply, divide) via stdio.
 - **sales_tools.py**: Implements sales data analysis tools (summarize, filter, trend, total by region, etc.).
@@ -81,6 +102,8 @@ python mcp_calculator_server.py
 - **ikea_return_policy.txt**: Example grounding context for the agent.
 - **user_profile.txt**: Example user memory/profile for the agent.
 - **requirements.txt**: All required Python dependencies for this project.
+- **AI4All - Hands-on - Fundamentals of LLM & Agents.code-workspace**: VS Code workspace settings.
+- **__pycache__/**: Python bytecode cache (auto-generated).
 
 ---
 

@@ -139,26 +139,58 @@ async def try_execute_tool(tool_name, params, mcp_math_tools):
                 return func(params.get("file", file), params.get("region", region))
             else:
                 return func(params.get("file", file))
-            
+        
         # MCP calculator tools
         mcp_tool_names = [tool.name for tool in mcp_math_tools]
         if tool_name in mcp_tool_names:
             tool = next((t for t in mcp_math_tools if t.name == tool_name), None)
             if tool:
-                # Prepare arguments in order
-                # Try to get parameter names robustly
-                if hasattr(tool, "param_names"):
-                    param_names = tool.param_names
+                session = getattr(tool, "server_session", None)
+                if not session:
+                    raise ValueError(f"No session found for tool: {tool_name}")
+
+                # Prepare arguments according to the tool's input schema
+                arguments = {}
+                schema_properties = tool.inputSchema.get('properties', {})
+                required_params = tool.inputSchema.get('required', [])
+                # params may be a dict from LLM, so use param names
+                for param_name in required_params:
+                    param_info = schema_properties.get(param_name, {})
+                    value = params.get(param_name)
+                    param_type = param_info.get('type', 'string')
+                    # Convert the value to the correct type based on the schema
+                    if value is None:
+                        raise ValueError(f"Missing required parameter: {param_name}")
+                    if param_type == 'integer':
+                        arguments[param_name] = int(value)
+                    elif param_type == 'number':
+                        arguments[param_name] = float(value)
+                    elif param_type == 'array':
+                        if isinstance(value, str):
+                            value = value.strip('[]').split(',')
+                        arguments[param_name] = [int(x.strip()) for x in value]
+                    else:
+                        arguments[param_name] = str(value)
+
+                # Call the tool using the session
+                result = await session.call_tool(tool_name, arguments=arguments)
+                # Handle result content
+                if hasattr(result, 'content'):
+                    if isinstance(result.content, list):
+                        iteration_result = [
+                            item.text if hasattr(item, 'text') else str(item)
+                            for item in result.content
+                        ]
+                    else:
+                        iteration_result = str(result.content)
                 else:
-                    # Fallback: use inspect
-                    import inspect
-                    sig = inspect.signature(tool)
-                    param_names = list(sig.parameters.keys())
-                #param_list = [params.get(p, 0) for p in param_names]
-                #result = await tool(*param_list)
-                param_dict = {p: params.get(p, 0) for p in param_names}
-                result = await tool.call(**param_dict)
-                return result
+                    iteration_result = str(result)
+                # Format the response
+                if isinstance(iteration_result, list):
+                    result_str = f"[{', '.join(iteration_result)}]"
+                else:
+                    result_str = str(iteration_result)
+                return result_str
         return f"Tool '{tool_name}' not found."
     except Exception as e:
         return f"Error executing tool: {e}"
@@ -200,7 +232,7 @@ async def main():
         elif hasattr(tool, 'model_dump'):
             dump = tool.model_dump()
             param_names = dump.get('parameters', []) or dump.get('param_names', [])
-        tool_lines.append(f"Name: {tool.name}\nDescription: {getattr(tool, 'description', '')}\nParameters: {param_names}\n")
+        tool_lines.append(f"Name: {tool.name}\nDescription: {getattr(tool, 'description', '')}\n" ###Parameters: {param_names}\n")
     math_tools_desc = '\n'.join(tool_lines)
     console.print(Panel(math_tools_desc, title="All MCP Tools"))
 

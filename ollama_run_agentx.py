@@ -13,6 +13,7 @@ model_url_generate = "http://localhost:11434/api/generate"
 #Add RAG
 #Add MCP
 #Show full integration if possible
+# Show conceptual MCP and Multi Agent
 
 # Load grounding context
 with open('ikea_return_policy.txt', 'r') as f:

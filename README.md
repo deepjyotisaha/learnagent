@@ -52,13 +52,14 @@ pip install -r requirements.txt
 ```bash
 python mcp_calculator_server.py
 ```
+Note: The MCP server is started by the agent, you don't need to start it when using with the agent.
 
 ### 4. Run the Agent
-- **Standard agent:**
+ **Standard agent with local tools:**
   ```bash
   python ollama_run_agentx.py
   ```
-- **Agent with MCP tools:**
+ **Agent with local and MCP tools:**
   ```bash
   python ollama_run_agentx_mcp.py
   ```
@@ -102,15 +103,6 @@ python mcp_calculator_server.py
 - **ikea_return_policy.txt**: Example grounding context for the agent.
 - **user_profile.txt**: Example user memory/profile for the agent.
 - **requirements.txt**: All required Python dependencies for this project.
-- **AI4All - Hands-on - Fundamentals of LLM & Agents.code-workspace**: VS Code workspace settings.
-- **__pycache__/**: Python bytecode cache (auto-generated).
-
----
-
-## 💡 Tips
-- Make sure the MCP server is running before starting the agent if you want to use MCP tools.
-- You can extend the agent by adding new tools to `sales_tools.py` and updating `sales_tools_description.json`.
-- For troubleshooting, check the terminal output and any log files generated.
 
 ---
 

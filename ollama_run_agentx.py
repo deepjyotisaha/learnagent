@@ -8,6 +8,8 @@ from sales_tools import summarize_sales, get_top_product, average_sales, filter_
 model_name = "llama3.1:latest"
 model_url_generate = "http://localhost:11434/api/generate"
 
+#Get me the sales for relevant region, and let me know in how many days can I return stuff from IKEA
+
 # Load grounding context
 with open('ikea_return_policy.txt', 'r') as f:
     grounding_blurb = f.read()
@@ -41,25 +43,30 @@ def generate_system_prompt(context, user_profile, tools_desc, history, user_quer
         )
     history_str = ""
     for i, (u, a) in enumerate(history):
-        history_str += f"User: {u}\nAgent: {a}\n"
+        step_num = i + 1
+        history_str += f"Step {step_num}:\nUser: {u}\nAgent: {a}\n"
     return f"""
-You are an AI assistant with access to the following:
+You are an AI assistant and your task is to complete the user's query.
 
-[Grounding Context]
-{context}
+The user's query is: 
+{user_query}
+
+You have access to the following:
+
+[Available Sales Tools]
+{tools_info}
+File name: {file}
 
 [User Profile]
 {user_profile}
 
-[Available Sales Tools]
-{tools_info}
-
-File name: {file}
+[Grounding Context]
+{context}
 
 [Conversation History]
 {history_str}
 
-Your job is to help the user complete their overall task, breaking it into steps if needed. 
+You break down user's query into steps if needed. 
 For each step, decide if you need to use a tool, reference the context, or use user memory. 
 If you use a tool, respond ONLY with a JSON object:
 {{
@@ -74,10 +81,7 @@ If the task is complete, respond with:
 }}
 Otherwise, answer directly and suggest the next step.
 
-User's overall query:
-{user_query}
-
-Current message:
+Latest user input:
 {current_message}
 """
 

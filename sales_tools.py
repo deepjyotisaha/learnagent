@@ -45,3 +45,14 @@ def sales_trend(file_path):
     df['Date'] = pd.to_datetime(df['Date'])
     trend = df.groupby('Date')['Revenue'].sum().sort_index()
     return trend.to_string()
+
+def total_sales_by_region(file_path, region):
+    """
+    Calculates the total sales (revenue) for a specific region.
+    """
+    df = pd.read_csv(file_path)
+    filtered = df[df['Region'].str.lower() == region.lower()]
+    if filtered.empty:
+        return f"No sales data found for region: {region}"
+    total_sales = filtered['Revenue'].sum()
+    return f"Total sales in region '{region}': ₹{total_sales}"

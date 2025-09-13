@@ -23,5 +23,10 @@
     "name": "sales_trend",
     "description": "Shows sales trend over time.",
     "parameters": ["file"]
+  },
+  {
+    "name": "total_sales_by_region",
+    "description": "Calculates the total sales (revenue) for a specific region.",
+    "parameters": ["file", "region"]
   }
 ]

@@ -85,7 +85,7 @@ Note: The MCP server is started by the agent, you don't need to start it when us
 
 ## 📄 File Details
 
-- **helloworld.py**: Minimal LLM call, basic prompt/response.
+- **helloworld.py**: Test if Python is installed.
 - **ollama_run_pretrained.py**: Use a base LLM for simple Q&A.
 - **ollama_run_finetuned.py**: Use a fine-tuned LLM for improved task performance.
 - **ollama_run_no_grounding.py**: LLM agent without external context.

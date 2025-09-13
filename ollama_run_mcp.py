@@ -156,11 +156,13 @@ async def execute_tool_in_mcp(tool_name, params, tools):
     print(f"DEBUG: Schema properties: {schema_properties}")
 
     for param_name, param_info in schema_properties.items():
-        if not params:  # Check if we have enough parameters
-            print
-            raise ValueError(f"Not enough parameters provided for {func_name}")
-            
-        value = params.pop(0)  # Get and remove the first parameter
+        print(f"DEBUG: Processing parameter: {param_name} with info {param_info}")
+        #if not params:  # Check if we have enough parameters
+        #    print
+        #    raise ValueError(f"Not enough parameters provided for {func_name}")
+        if param_name not in params:
+            raise ValueError(f"Missing required parameter: {param_name}")
+        value = params[param_name]
         param_type = param_info.get('type', 'string')
         
         print(f"DEBUG: Converting parameter {param_name} with value {value} to type {param_type}")
@@ -184,7 +186,7 @@ async def execute_tool_in_mcp(tool_name, params, tools):
     #result = await tools.server_session.call_tool(func_name, arguments=arguments)
     result = await session.call_tool(func_name, arguments=arguments)
     print(f"DEBUG: Raw result: {result}")
-    return str
+    return str(result)
 
 
 async def try_execute_tool(tool_name, params, math_tools):

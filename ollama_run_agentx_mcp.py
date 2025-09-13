@@ -65,7 +65,7 @@ You have access to the following:
 
 [Available Sales Tools]
 {tools_info}
-File name: {file}
+File name for Sales Tools: {file}
 
 [Available Math Tools in MCP]
 {mcp_tool_desc}

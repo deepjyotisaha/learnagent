@@ -17,11 +17,6 @@ def add(a: int, b: int) -> int:
     """Add two numbers"""
     return int(a + b)
 
-@mcp.tool()
-def add_list(l: list) -> int:
-    """Add all numbers in a list"""
-    return sum(l)
-
 # subtraction tool
 @mcp.tool()
 def subtract(a: int, b: int) -> int:

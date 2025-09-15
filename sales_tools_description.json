@@ -16,7 +16,7 @@
   },
   {
     "name": "filter_by_region",
-    "description": "Filters sales data by region.",
+    "description": "Display sales data by region.",
     "parameters": ["file", "region"]
   },
   {

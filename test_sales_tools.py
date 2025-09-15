@@ -1,5 +1,5 @@
 import json
-from sales_tools import summarize_sales, get_top_product, average_sales, filter_by_region, sales_trend
+from sales_tools import summarize_sales, get_top_product, average_sales, filter_by_region, sales_trend, total_sales_by_region
 from rich.console import Console, Group
 from rich.panel import Panel
 from rich.table import Table
@@ -15,6 +15,7 @@ tool_functions = {
     "average_sales": (average_sales, {"file": file}),
     "filter_by_region": (filter_by_region, {"file": file, "region": region}),
     "sales_trend": (sales_trend, {"file": file}),
+    "total_sales_by_region": (total_sales_by_region, {"file": file, "region": region}),
 }
 
 # Load tool descriptions
